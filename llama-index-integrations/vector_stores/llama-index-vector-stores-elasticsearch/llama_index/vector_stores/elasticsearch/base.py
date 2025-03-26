@@ -74,7 +74,13 @@ def _to_elasticsearch_filter(
                     }
                 }
             )
-        return {"bool": {"must": operands}}
+        if standard_filters.condition == "and":
+            return {"bool": {"must": operands}}
+        elif standard_filters.condition == "or":
+            return {"bool": {"should": operands, "minimum_should_match": 1}}
+        else:
+            raise ValueError(f"Unsupported logical operator: {standard_filters.condition}")
+
 
 
 def _to_llama_similarities(scores: List[float]) -> List[float]:
